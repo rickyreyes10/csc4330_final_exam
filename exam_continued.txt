@@ -1,0 +1,105 @@
+5)  selection statement (if):
+      M_if(<IF_STMT>, s) => if M_bool_expr(<BOOL_EXPR>, s) == error
+             then error
+             else if M_bool_expr(<BOOL_EXPR>, s) == true
+             then M_block(<BLOCK1>, s)
+             else (if <IF_STMT> contains an else block)
+             then M_block(<BLOCK2>, s)
+             else s
+
+6)  loop statement (while):
+      M_while(<WHILE_LOOP>, s) => if M_bool_expr(<BOOL_EXPR>, s) == error
+      then error
+      else if M_bool_expr(<BOOL_EXPR>, s) == true
+      then M_block(<BLOCK>, s)
+      else s
+
+7)  expr statement (expression):
+      M_expr(<EXPR>, s) =>
+      if M_term(<TERM1>, s) == error
+      then error
+      else if there are no more terms in <EXPR>
+      then M_term(<TERM1>, s)
+      else if M_term(<TERM2>, s) == error
+      then error
+      else M_term(<TERM1>, s) ± M_expr(<REST_OF_EXPR>, s)
+
+
+8)  expr statement returns Boolean solution:
+      M_expr(<EXPR>, s) =>
+      if M_bool_expr(<BOOL_EXPR>, s) == error
+      then error
+      else if M_bool_expr(<BOOL_EXPR>, s) is of type Boolean
+      then M_bool_expr(<BOOL_EXPR>, s)
+      else if M_term(<TERM1>, s) == error
+      then error
+      else if there are no more terms in <EXPR>
+      then M_term(<TERM1>, s)
+      else if M_term(<TERM2>, s) == error
+      then error
+      else M_term(<TERM1>, s) ± M_expr(<REST_OF_EXPR>, s)
+
+
+
+9) attribute grammar for assignment statement:
+
+<ASSIGN> -->  ID '=' <EXPR> { type_check(<ASSIGN>.type, ID.type, <EXPR>.type) }
+<ID> -->  identifier { ID.type = search_type(identifier) }
+<EXPR> -->  <EXPR1> { <EXPR>.type = <EXPR1>.type }
+<EXPR1> -->  <TERM> { <EXPR1>.type = <TERM>.type }
+          | <EXPR1> '+' <TERM> { <EXPR1>.type = type_add(<EXPR1>.type, <TERM>.type) }
+          | <EXPR1> '-' <TERM> { <EXPR1>.type = type_subtract(<EXPR1>.type, <TERM>.type) }
+<TERM> -->  <FACT> { <TERM>.type = <FACT>.type }
+         | <TERM> '*' <FACT> { <TERM>.type = type_multiply(<TERM>.type, <FACT>.type) }
+         | <TERM> '/' <FACT> { <TERM>.type = type_divide(<TERM>.type, <FACT>.type);               check_divide_by_zero(<FACT>.value) }
+         | <TERM> '%' <FACT> { <TERM>.type = type_modulo(<TERM>.type, <FACT>.type); check_modulo_by_zero(<FACT>.value) }
+<FACT> -->  ID { <FACT>.type = ID.type }
+         | NATURAL_LIT { <FACT>.type = natural }
+         | REAL_LIT { <FACT>.type = real }
+         | BOOL_LIT { <FACT>.type = boolean }
+         | CHAR_LIT { <FACT>.type = char }
+         | STRING_LIT { <FACT>.type = string }
+
+
+10)  3 syntactically valid assignment statements with at least 7 tokens that show failing or passing rules:
+
+1. varA = “this” + “store” * 3; 
+- This assignment statement has 8 total tokens. It passes rule(a) b/c two strings are concatenated. It also passes rule(b) b/c it means “store” is repeated 3 times due to multiplication of 3.
+
+2. varB = 5 * ‘B’ * ‘C’;
+- This assignment statement has 8 total tokens. It passes rule(e) b/c of the assignment of a character to a natural number being allowed. 
+
+3. varC = “not” + “wrong” + True;
+- This assignment statement has 8 total tokens. It fails rule(h) since this is trying to add a String and a Boolean.
+
+
+
+
+
+
+11)  Axiomatic Semantics ( find the weakest precondition) :
+
+a.  a = 2 * (b - 1) - 1 {a > 0}
+Weakest Precondition =  b > 1
+
+b.
+if (x < y)
+x = x + 1
+else
+x = 3 * x
+{x < 0}
+N/A
+c.
+y = a * 2 * (b - 1) - 1
+if (x < y)
+x = y + 1
+else
+x = 3 * x
+{x < 0}
+N/A
+d.
+a = 3 * (2 * b + a);
+b = 2 * a - 1 
+{b > 5}
+N/A
+
