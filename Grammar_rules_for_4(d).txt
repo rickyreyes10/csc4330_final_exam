@@ -1,0 +1,16 @@
+<STMT>  -->  <IF_STMT> | <BLOCK> | <ASSIGN> | <DECLARE> | <WHILE_LOOP> | <FUNCTIONS_DEFINITION>
+<STMT_LIST> --> { <STMT> `;` }
+<WHILE_LOOP> -->  `while` `(` <BOOL_EXPR> `)` <BLOCK>
+<IF_STMT> --> `if` `(` <BOOL_EXPR> `)` <BLOCK> [ `else' <BLOCK> ]
+<BLOCK> --> `{` <STMT_LIST> `}`
+<DECLARE> --> 'DataType' ID {',' ID}
+<ASSIGN> --> ID '=' <EXPR>
+<EXPR> --> [ '-' ] <TERM> {(`+`|`-`) <TERM>}
+<TERM> -->  <FACT> {(`*`|`/`|`%`) <FACT>}
+<FACT> --> ID | NATURAL_LIT | REAL_LIT | BOOL_LIT | CHAR_LIT | STRING_LIT | <FUNCTION_CALL> | `(` <EXPR> `)`
+<BOOL_EXPR> -->  <BTERM> {(`>`|`<`|`>==`|`<==`) <BTERM>}
+<BTERM> -->  <BAND> {(`==`|`!==`) <BAND>}
+<BAND> -->  <BOR> {`&&` <BOR>}
+<BOR> -->  <EXPR> {`||` <EXPR>}
+<FUNCTION_CALL> --> ID `(` [ <EXPR> {`,` <EXPR>} ] `)`
+<FUNCTIONS_DEFINITION> --> `DataType` ID `(` [ `DataType` ID {`,` `DataType` ID} ]
